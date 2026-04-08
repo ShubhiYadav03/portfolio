@@ -1,0 +1,142 @@
+---
+/**
+ * Projects — "The Piano Keys"
+ * Skills/projects as interactive piano keys with Tone.js sound.
+ */
+
+const whiteKeys = [
+  { note: "C4", label: "TypeScript", detail: "Primary language — type-safe, scalable, expressive." },
+  { note: "D4", label: "React", detail: "Component architecture for rich interactive UIs." },
+  { note: "E4", label: "Node.js", detail: "Server-side JavaScript — APIs, tooling, and more." },
+  { note: "F4", label: "Three.js", detail: "3D graphics on the web — this very site." },
+  { note: "G4", label: "C#/.NET", detail: "Game services and platform engineering at Xbox." },
+  { note: "A4", label: "Python", detail: "Data, scripting, and rapid prototyping." },
+  { note: "B4", label: "Cloud/Azure", detail: "Distributed systems at scale." },
+];
+
+const blackKeys = [
+  { note: "C#4", label: "GSAP", position: 1 },
+  { note: "D#4", label: "Docker", position: 2 },
+  { note: "F#4", label: "GraphQL", position: 4 },
+  { note: "G#4", label: "Git", position: 5 },
+  { note: "A#4", label: "SQL", position: 6 },
+];
+---
+
+<section id="projects" class="section relative">
+  <div class="max-w-5xl mx-auto w-full">
+    <!-- Section header -->
+    <div class="text-center mb-16 projects-header">
+      <p class="text-lamplight text-sm tracking-[0.3em] uppercase mb-3">Skills & Projects</p>
+      <h2 class="text-4xl md:text-5xl font-serif text-cream">The Piano <span class="text-lamplight italic">Keys</span></h2>
+      <p class="text-lavender/50 text-sm mt-3 max-w-md mx-auto">Hover to play — each key is a skill, together they compose my craft.</p>
+      <div class="divider mt-4"></div>
+    </div>
+
+    <!-- Piano -->
+    <div class="piano-wrapper overflow-x-auto pb-4">
+      <div class="piano relative flex justify-center mx-auto" id="piano" style="min-width: 600px;">
+        <!-- White keys -->
+        <div class="flex gap-1">
+          {whiteKeys.map((key, i) => (
+            <button
+              class="white-key group relative w-16 md:w-20 h-48 md:h-56 bg-gradient-to-b from-cream/95 to-cream/80 rounded-b-lg border border-cream/20 hover:from-lamplight/90 hover:to-amber-glow/80 transition-all duration-150 cursor-pointer flex flex-col items-center justify-end pb-4 shadow-lg hover:shadow-lamplight/20 active:h-[calc(100%-4px)] active:mt-1"
+              data-note={key.note}
+              data-label={key.label}
+              data-detail={key.detail}
+              data-index={i}
+            >
+              <span class="text-midnight text-[10px] md:text-xs font-sans font-medium opacity-60 group-hover:opacity-100 transition-opacity">{key.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <!-- Black keys (absolutely positioned) -->
+        <div class="absolute top-0 left-0 right-0 flex justify-center pointer-events-none">
+          <div class="relative flex gap-1" style="width: calc(7 * (5rem + 0.25rem));">
+            {blackKeys.map((key) => (
+              <button
+                class="black-key pointer-events-auto absolute w-10 md:w-12 h-28 md:h-32 bg-gradient-to-b from-midnight to-deep-indigo rounded-b-md border border-cream/10 hover:from-lamplight/30 hover:to-midnight transition-all duration-150 cursor-pointer flex items-end justify-center pb-2 shadow-xl active:h-[calc(100%-3px)] active:mt-[3px] z-10"
+                data-note={key.note}
+                data-label={key.label}
+                style={`left: calc(${key.position} * (5rem + 0.25rem) - 1.25rem);`}
+              >
+                <span class="text-cream/40 text-[8px] md:text-[10px] font-sans hover:text-cream/80 transition-colors">{key.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail card (appears on hover) -->
+    <div class="mt-8 flex justify-center">
+      <div
+        id="key-detail"
+        class="bg-cream/[0.03] border border-cream/10 rounded-xl p-6 max-w-md w-full text-center opacity-0 transition-all duration-300 min-h-[100px] flex flex-col items-center justify-center"
+      >
+        <p class="text-lamplight font-serif text-xl" id="key-detail-label">Hover a key to explore</p>
+        <p class="text-lavender/60 text-sm mt-1" id="key-detail-text">Each key represents a skill in my repertoire</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  let synth: any = null;
+
+  async function initSynth() {
+    if (synth) return synth;
+    const Tone = await import("tone");
+    synth = new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: "triangle" },
+      envelope: { attack: 0.02, decay: 0.3, sustain: 0.2, release: 1.0 },
+      volume: -12,
+    }).toDestination();
+    return synth;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const allKeys = document.querySelectorAll<HTMLButtonElement>(".white-key, .black-key");
+    const detailCard = document.getElementById("key-detail")!;
+    const detailLabel = document.getElementById("key-detail-label")!;
+    const detailText = document.getElementById("key-detail-text")!;
+
+    allKeys.forEach((key) => {
+      key.addEventListener("mouseenter", () => {
+        const label = key.dataset.label || "";
+        const detail = key.dataset.detail || label;
+        detailLabel.textContent = label;
+        detailText.textContent = detail;
+        gsap.to(detailCard, { opacity: 1, y: 0, duration: 0.2 });
+      });
+
+      key.addEventListener("click", async () => {
+        const note = key.dataset.note;
+        if (!note) return;
+        try {
+          const s = await initSynth();
+          const Tone = await import("tone");
+          await Tone.start();
+          s.triggerAttackRelease(note, "8n");
+        } catch { /* Audio not available */ }
+      });
+    });
+
+    // Scroll animations
+    gsap.from(".projects-header", {
+      scrollTrigger: { trigger: "#projects", start: "top 70%", toggleActions: "play none none reverse" },
+      y: 40, opacity: 0, duration: 0.8, ease: "power3.out",
+    });
+
+    gsap.from(".white-key", {
+      scrollTrigger: { trigger: "#piano", start: "top 80%", toggleActions: "play none none reverse" },
+      y: 80, opacity: 0, duration: 0.5, stagger: 0.07, ease: "back.out(1.4)",
+    });
+  });
+</script>

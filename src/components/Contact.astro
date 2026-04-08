@@ -1,0 +1,112 @@
+---
+/**
+ * Contact — "The Next Chapter"
+ * Open book contact form with ink-flow aesthetics.
+ */
+---
+
+<section id="contact" class="section relative">
+  <div class="max-w-2xl mx-auto w-full">
+    <!-- Section header -->
+    <div class="text-center mb-12 contact-header">
+      <p class="text-lamplight text-sm tracking-[0.3em] uppercase mb-3">Contact</p>
+      <h2 class="text-4xl md:text-5xl font-serif text-cream">The Next <span class="text-lamplight italic">Chapter</span></h2>
+      <p class="text-lavender/50 text-sm mt-3 max-w-md mx-auto italic font-serif">
+        The pages ahead are unwritten — let's compose them together.
+      </p>
+      <div class="divider mt-4"></div>
+    </div>
+
+    <!-- Contact form styled as an open book -->
+    <div class="book-form relative bg-gradient-to-br from-[#1a1530]/80 to-[#0d0f20]/80 border border-cream/10 rounded-xl p-8 md:p-12 backdrop-blur-sm">
+      {/* Spine decoration */}
+      <div class="absolute left-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-lamplight/20 to-transparent hidden md:block"></div>
+
+      <form class="space-y-6" id="contact-form">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="form-field">
+            <label for="name" class="text-lavender/60 text-xs tracking-widest uppercase block mb-2">Your Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="The author of this message..."
+              class="w-full bg-transparent border-b border-cream/15 text-cream py-2 px-1 focus:border-lamplight focus:outline-none transition-colors placeholder:text-lavender/20 font-serif"
+            />
+          </div>
+          <div class="form-field">
+            <label for="email" class="text-lavender/60 text-xs tracking-widest uppercase block mb-2">Your Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Where stars can reach you..."
+              class="w-full bg-transparent border-b border-cream/15 text-cream py-2 px-1 focus:border-lamplight focus:outline-none transition-colors placeholder:text-lavender/20 font-serif"
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="message" class="text-lavender/60 text-xs tracking-widest uppercase block mb-2">Your Message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows={5}
+            placeholder="Write the first line of our story..."
+            class="w-full bg-transparent border-b border-cream/15 text-cream py-2 px-1 focus:border-lamplight focus:outline-none transition-colors placeholder:text-lavender/20 font-serif resize-none"
+          ></textarea>
+        </div>
+
+        <div class="flex justify-center pt-4">
+          <button
+            type="submit"
+            class="group relative px-8 py-3 border border-lamplight/40 rounded-lg text-lamplight font-serif text-lg hover:bg-lamplight/10 hover:border-lamplight transition-all duration-300 cursor-pointer overflow-hidden"
+          >
+            <span class="relative z-10">Send to the Stars ✦</span>
+            <div class="absolute inset-0 bg-gradient-to-r from-lamplight/0 via-lamplight/10 to-lamplight/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    gsap.from(".contact-header", {
+      scrollTrigger: { trigger: "#contact", start: "top 70%", toggleActions: "play none none reverse" },
+      y: 40, opacity: 0, duration: 0.8, ease: "power3.out",
+    });
+
+    gsap.from(".book-form", {
+      scrollTrigger: { trigger: ".book-form", start: "top 80%", toggleActions: "play none none reverse" },
+      y: 60, opacity: 0, scale: 0.98, duration: 0.9, ease: "power3.out",
+    });
+
+    gsap.from(".form-field", {
+      scrollTrigger: { trigger: ".book-form", start: "top 75%", toggleActions: "play none none reverse" },
+      y: 20, opacity: 0, duration: 0.5, stagger: 0.1, ease: "power2.out",
+    });
+
+    // Form submit constellation burst
+    document.getElementById("contact-form")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const btn = (e.target as HTMLFormElement).querySelector("button")!;
+      gsap.to(btn, {
+        scale: 1.05,
+        duration: 0.15,
+        yoyo: true,
+        repeat: 1,
+        onComplete: () => {
+          btn.innerHTML = '<span class="relative z-10">✦ Message Sent to the Cosmos ✦</span>';
+          gsap.from(btn, { opacity: 0, y: 10, duration: 0.4 });
+        },
+      });
+    });
+  });
+</script>

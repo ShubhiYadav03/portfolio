@@ -1,0 +1,72 @@
+---
+/**
+ * Hero — "Fate Written in the Stars"
+ * 3D star field with constellation name-tracing, parallax, scroll indicator.
+ * Three.js canvas is in Layout; this component provides the overlay content.
+ */
+---
+
+<section id="hero" class="section relative min-h-screen flex flex-col items-center justify-center text-center">
+  <!-- Constellation name renders here via Three.js; this is the fallback / overlay -->
+  <div class="hero-content relative z-10 flex flex-col items-center gap-6 opacity-0" id="hero-content">
+    <p class="text-lavender text-sm tracking-[0.3em] uppercase font-sans">Welcome to my universe</p>
+
+    <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif text-cream leading-tight">
+      Shubhi <span class="text-lamplight">Yadav</span>
+    </h1>
+
+    <div class="divider"></div>
+
+    <p class="text-xl md:text-2xl text-lavender font-serif italic max-w-xl">
+      Fate written in the stars
+    </p>
+
+    <p class="text-lavender/70 text-sm md:text-base max-w-md mt-2 font-sans">
+      Software Engineer · Xbox · Reader of Worlds
+    </p>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-0" id="scroll-indicator">
+    <span class="text-lavender/50 text-xs tracking-widest uppercase">Scroll</span>
+    <div class="w-px h-8 bg-gradient-to-b from-lamplight/60 to-transparent animate-pulse"></div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+
+  // Animate hero content in
+  document.addEventListener("DOMContentLoaded", () => {
+    const tl = gsap.timeline({ delay: 0.5 });
+
+    tl.to("#hero-content", {
+      opacity: 1,
+      duration: 0.8,
+      ease: "power2.out",
+    })
+    .from("#hero-content h1", {
+      y: 40,
+      opacity: 0,
+      duration: 1,
+      ease: "power3.out",
+    }, "-=0.5")
+    .from("#hero-content .divider", {
+      scaleX: 0,
+      duration: 0.8,
+      ease: "power2.inOut",
+    }, "-=0.5")
+    .from("#hero-content p", {
+      y: 20,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.15,
+      ease: "power2.out",
+    }, "-=0.4")
+    .to("#scroll-indicator", {
+      opacity: 1,
+      duration: 0.6,
+      ease: "power2.out",
+    }, "-=0.2");
+  });
+</script>

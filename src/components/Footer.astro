@@ -1,0 +1,42 @@
+---
+/**
+ * Footer — "The Stars Remember"
+ * Minimal footer with constellation initials.
+ */
+
+const links = [
+  { label: "GitHub", href: "#" },
+  { label: "LinkedIn", href: "#" },
+  { label: "Email", href: "mailto:hello@example.com" },
+];
+---
+
+<footer class="relative z-10 py-12 px-6 border-t border-cream/5">
+  <div class="max-w-4xl mx-auto flex flex-col items-center gap-6">
+    <!-- Constellation initials -->
+    <div class="text-lamplight/40 font-serif text-2xl tracking-widest">✦ S · Y ✦</div>
+
+    <!-- Links -->
+    <nav class="flex gap-6">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class="text-lavender/40 text-sm hover:text-lamplight transition-colors duration-300"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {link.label}
+        </a>
+      ))}
+    </nav>
+
+    <!-- Quote -->
+    <p class="text-lavender/20 text-xs font-serif italic text-center max-w-sm">
+      "I am a little world made cunningly" — John Donne
+    </p>
+
+    <p class="text-lavender/15 text-xs">
+      © {new Date().getFullYear()} · Made with starlight & metaphors
+    </p>
+  </div>
+</footer>

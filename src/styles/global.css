@@ -1,0 +1,98 @@
+@import "tailwindcss";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/playfair-display/400.css";
+@import "@fontsource/playfair-display/400-italic.css";
+@import "@fontsource/playfair-display/700.css";
+
+/* ── Ink & Starlight Palette ── */
+@theme {
+  --color-midnight: #080b1a;
+  --color-deep-indigo: #0f1535;
+  --color-lamplight: #d4a853;
+  --color-bright-gold: #f0c66e;
+  --color-cream: #f0e6d3;
+  --color-lavender: #a0a0c0;
+  --color-starlight: #e8e0f0;
+  --color-amber-glow: #ff9f43;
+
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+/* ── Base Styles ── */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: linear-gradient(180deg, var(--color-midnight) 0%, var(--color-deep-indigo) 100%);
+  color: var(--color-cream);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+}
+
+/* ── Selection ── */
+::selection {
+  background: color-mix(in srgb, var(--color-lamplight) 40%, transparent);
+  color: var(--color-cream);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-midnight);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-lamplight);
+  border-radius: 3px;
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Canvas (Three.js) ── */
+#three-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Section Base ── */
+.section {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+}
+
+/* ── Gold Divider ── */
+.divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-lamplight), transparent);
+  margin: 0 auto;
+}
