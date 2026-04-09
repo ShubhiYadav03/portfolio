@@ -18,13 +18,10 @@ import Footer from "../components/Footer.astro";
 </Layout>
 
 <script>
-  // Initialize the Three.js star field on the shared background canvas
   import { initStarField } from "../three/starField";
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const canvas = document.getElementById("three-canvas") as HTMLCanvasElement;
-    if (canvas) {
-      initStarField(canvas);
-    }
-  });
+  const canvas = document.getElementById("three-canvas") as HTMLCanvasElement;
+  if (canvas) {
+    initStarField(canvas);
+  }
 </script>

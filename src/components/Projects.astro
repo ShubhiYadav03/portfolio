@@ -101,42 +101,40 @@ const blackKeys = [
     return synth;
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const allKeys = document.querySelectorAll<HTMLButtonElement>(".white-key, .black-key");
-    const detailCard = document.getElementById("key-detail")!;
-    const detailLabel = document.getElementById("key-detail-label")!;
-    const detailText = document.getElementById("key-detail-text")!;
+  const allKeys = document.querySelectorAll<HTMLButtonElement>(".white-key, .black-key");
+  const detailCard = document.getElementById("key-detail")!;
+  const detailLabel = document.getElementById("key-detail-label")!;
+  const detailText = document.getElementById("key-detail-text")!;
 
-    allKeys.forEach((key) => {
-      key.addEventListener("mouseenter", () => {
-        const label = key.dataset.label || "";
-        const detail = key.dataset.detail || label;
-        detailLabel.textContent = label;
-        detailText.textContent = detail;
-        gsap.to(detailCard, { opacity: 1, y: 0, duration: 0.2 });
-      });
-
-      key.addEventListener("click", async () => {
-        const note = key.dataset.note;
-        if (!note) return;
-        try {
-          const s = await initSynth();
-          const Tone = await import("tone");
-          await Tone.start();
-          s.triggerAttackRelease(note, "8n");
-        } catch { /* Audio not available */ }
-      });
+  allKeys.forEach((key) => {
+    key.addEventListener("mouseenter", () => {
+      const label = key.dataset.label || "";
+      const detail = key.dataset.detail || label;
+      detailLabel.textContent = label;
+      detailText.textContent = detail;
+      gsap.to(detailCard, { opacity: 1, y: 0, duration: 0.2 });
     });
 
-    // Scroll animations
-    gsap.from(".projects-header", {
-      scrollTrigger: { trigger: "#projects", start: "top 70%", toggleActions: "play none none reverse" },
-      y: 40, opacity: 0, duration: 0.8, ease: "power3.out",
+    key.addEventListener("click", async () => {
+      const note = key.dataset.note;
+      if (!note) return;
+      try {
+        const s = await initSynth();
+        const Tone = await import("tone");
+        await Tone.start();
+        s.triggerAttackRelease(note, "8n");
+      } catch { /* Audio not available */ }
     });
+  });
 
-    gsap.from(".white-key", {
-      scrollTrigger: { trigger: "#piano", start: "top 80%", toggleActions: "play none none reverse" },
-      y: 80, opacity: 0, duration: 0.5, stagger: 0.07, ease: "back.out(1.4)",
-    });
+  // Scroll animations
+  gsap.from(".projects-header", {
+    scrollTrigger: { trigger: "#projects", start: "top 70%", toggleActions: "play none none reverse" },
+    y: 40, opacity: 0, duration: 0.8, ease: "power3.out",
+  });
+
+  gsap.from(".white-key", {
+    scrollTrigger: { trigger: "#piano", start: "top 80%", toggleActions: "play none none reverse" },
+    y: 80, opacity: 0, duration: 0.5, stagger: 0.07, ease: "back.out(1.4)",
   });
 </script>
