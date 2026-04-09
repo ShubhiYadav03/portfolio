@@ -1,7 +1,7 @@
 ---
 /**
  * Experience — "Turning the Page"
- * Work experiences as book pages with GSAP 3D page-turn animations.
+ * Real 3D page-flip book using StPageFlip library.
  */
 
 const chapters = [
@@ -38,210 +38,225 @@ const chapters = [
     <div class="text-center mb-12 experience-header">
       <p class="text-lamplight text-sm tracking-[0.3em] uppercase mb-3">Experience</p>
       <h2 class="text-4xl md:text-5xl font-serif text-cream">Turning the <span class="text-bright-gold italic">Page</span></h2>
+      <p class="text-lavender/40 text-sm mt-2 italic">Click the page edges or use the arrows to flip</p>
       <div class="divider mt-4"></div>
     </div>
 
-    <!-- Book -->
-    <div class="book-wrapper" id="book-wrapper" style="perspective: 1400px;">
-      <!-- Page navigation -->
-      <div class="flex justify-center gap-6 mb-6">
-        <button id="prev-page" class="text-lavender/40 hover:text-lamplight transition-colors text-sm tracking-widest uppercase cursor-pointer disabled:opacity-20 disabled:cursor-default" disabled>
-          ← Previous
-        </button>
-        <span id="page-counter" class="text-lavender/30 text-sm font-serif italic">page 1 of {chapters.length}</span>
-        <button id="next-page" class="text-lavender/40 hover:text-lamplight transition-colors text-sm tracking-widest uppercase cursor-pointer disabled:opacity-20 disabled:cursor-default">
-          Next →
-        </button>
-      </div>
+    <!-- Flipbook container -->
+    <div class="flex justify-center">
+      <div id="flipbook" class="flipbook-container"></div>
+    </div>
 
-      <!-- Pages stack -->
-      <div class="book-pages relative" id="book-pages" style="min-height: 380px;">
-        {chapters.map((ch, index) => (
-          <div
-            class:list={[
-              "book-page absolute inset-0 backface-hidden rounded-xl overflow-hidden",
-              "border border-cream/10 backdrop-blur-sm",
-              index === 0 ? "opacity-100 z-10" : "opacity-0 z-0",
-            ]}
-            data-page={index}
-            style={`transform-style: preserve-3d; ${index > 0 ? 'transform: rotateY(20deg); pointer-events: none;' : ''}`}
-          >
-            {/* Parchment-like inner background */}
-            <div class="absolute inset-0 bg-gradient-to-br from-[#1a1530]/95 via-[#14102a]/90 to-[#0d0f20]/95"></div>
+    <!-- Navigation arrows -->
+    <div class="flex justify-center gap-8 mt-6">
+      <button id="prev-page" class="text-lavender/40 hover:text-lamplight transition-colors text-2xl cursor-pointer px-4 py-2">
+        ‹
+      </button>
+      <span id="page-counter" class="text-lavender/30 text-sm font-serif italic self-center"></span>
+      <button id="next-page" class="text-lavender/40 hover:text-lamplight transition-colors text-2xl cursor-pointer px-4 py-2">
+        ›
+      </button>
+    </div>
 
-            {/* Gold edge glow */}
-            <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-lamplight/40 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-bright-gold/20 to-transparent"></div>
-            <div class="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-starlight/25 to-transparent"></div>
-
-            {/* Page corner fold */}
-            <div class="absolute top-0 right-0 w-0 h-0 border-t-[40px] border-t-lamplight/[0.07] border-l-[40px] border-l-transparent"></div>
-
-            {/* Content */}
-            <div class="relative z-10 p-8 md:p-12">
-              <p class="text-lamplight/40 text-xs tracking-[0.4em] uppercase mb-6 font-sans">{ch.chapter}</p>
-
-              <h3 class="text-2xl md:text-3xl font-serif text-cream mb-1">{ch.role}</h3>
-              <p class="text-lamplight font-serif italic text-lg mb-1">{ch.company}</p>
-              <p class="text-lavender/40 text-sm mb-6">{ch.period}</p>
-
-              <p class="text-lavender/80 leading-relaxed mb-6 max-w-2xl">{ch.description}</p>
-
-              <ul class="space-y-2">
-                {ch.highlights.map((h) => (
-                  <li class="flex items-start gap-3 text-lavender/60 text-sm">
-                    <span class="text-lamplight mt-0.5">✦</span>
-                    <span>{h}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <p class="absolute bottom-5 right-8 text-lavender/15 text-xs font-serif italic">
-                page {index + 1}
-              </p>
-            </div>
+    <!-- Hidden page templates for StPageFlip -->
+    <div id="page-templates" class="hidden">
+      <!-- Cover -->
+      <div class="page page-cover" data-density="hard">
+        <div class="page-inner cover-front">
+          <div class="flex flex-col items-center justify-center h-full gap-4 p-8 text-center">
+            <div class="w-12 h-px bg-lamplight/40 mb-2"></div>
+            <h3 class="text-3xl font-serif text-cream">The Story</h3>
+            <h3 class="text-3xl font-serif text-lamplight italic">So Far</h3>
+            <div class="w-12 h-px bg-lamplight/40 mt-2"></div>
+            <p class="text-lavender/40 text-xs mt-6 tracking-widest uppercase">Shubhi Yadav</p>
           </div>
-        ))}
+        </div>
       </div>
 
-      <!-- Page dots -->
-      <div class="flex justify-center gap-2 mt-6">
-        {chapters.map((_, index) => (
-          <button
-            class:list={[
-              "page-dot w-2 h-2 rounded-full transition-all duration-300 cursor-pointer",
-              index === 0 ? "bg-lamplight scale-125" : "bg-lavender/20 hover:bg-lavender/40",
-            ]}
-            data-dot={index}
-          ></button>
-        ))}
+      <!-- Chapter pages -->
+      {chapters.map((ch, index) => (
+        <div class="page" data-density="soft">
+          <div class="page-inner">
+            <p class="text-lamplight/40 text-[10px] tracking-[0.3em] uppercase mb-4 font-sans">{ch.chapter}</p>
+            <h3 class="text-xl font-serif text-cream mb-0.5 leading-snug">{ch.role}</h3>
+            <p class="text-lamplight font-serif italic text-sm mb-0.5">{ch.company}</p>
+            <p class="text-lavender/40 text-xs mb-4">{ch.period}</p>
+            <p class="text-lavender/70 text-xs leading-relaxed mb-4">{ch.description}</p>
+            <ul class="space-y-1.5">
+              {ch.highlights.map((h) => (
+                <li class="flex items-start gap-2 text-lavender/50 text-xs">
+                  <span class="text-lamplight text-[10px] mt-0.5">✦</span>
+                  <span>{h}</span>
+                </li>
+              ))}
+            </ul>
+            <p class="absolute bottom-3 right-4 text-lavender/15 text-[10px] font-serif italic">
+              page {index + 1}
+            </p>
+          </div>
+        </div>
+      ))}
+
+      <!-- Back cover -->
+      <div class="page page-cover" data-density="hard">
+        <div class="page-inner cover-back">
+          <div class="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
+            <p class="text-lamplight/60 font-serif italic text-lg">To be continued...</p>
+            <div class="w-8 h-px bg-lamplight/30"></div>
+            <p class="text-lavender/30 text-xs">✦</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  .backface-hidden {
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+  .flipbook-container {
+    position: relative;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* Page base — both covers and content pages */
+  .page {
+    background: linear-gradient(135deg, #12102a 0%, #0e0c22 50%, #0a0818 100%);
+    border: 1px solid rgba(0, 240, 255, 0.08);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(180, 77, 255, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(0, 240, 255, 0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .page-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  /* Covers */
+  .cover-front, .cover-back {
+    background: linear-gradient(135deg, #0d0b20 0%, #08071a 100%);
+    border: 1px solid rgba(0, 240, 255, 0.12);
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  .cover-front {
+    box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.03),
+                inset 0 0 60px rgba(180, 77, 255, 0.02);
+  }
+
+  /* Page spine shadow (left edge of right-side pages) */
+  .page-inner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(0,0,0,0.15), transparent);
+    pointer-events: none;
+  }
+
+  /* Neon top edge on pages */
+  .page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.15), transparent);
+    pointer-events: none;
+  }
+
+  /* StPageFlip adds .stf__parent — style the book shadow */
+  :global(.stf__parent) {
+    filter: drop-shadow(0 8px 30px rgba(0, 240, 255, 0.08))
+            drop-shadow(0 2px 10px rgba(180, 77, 255, 0.06));
   }
 </style>
 
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { PageFlip } from "page-flip";
 
   gsap.registerPlugin(ScrollTrigger);
 
-  let currentPage = 0;
-  const pages = document.querySelectorAll<HTMLElement>(".book-page");
-  const dots = document.querySelectorAll<HTMLElement>(".page-dot");
-  const prevBtn = document.getElementById("prev-page") as HTMLButtonElement;
-  const nextBtn = document.getElementById("next-page") as HTMLButtonElement;
+  const container = document.getElementById("flipbook")!;
+  const templates = document.getElementById("page-templates")!;
+  const prevBtn = document.getElementById("prev-page")!;
+  const nextBtn = document.getElementById("next-page")!;
   const counter = document.getElementById("page-counter")!;
-  const totalPages = pages.length;
-  let isAnimating = false;
 
-  function goToPage(target: number) {
-    if (target === currentPage || target < 0 || target >= totalPages || isAnimating) return;
-    isAnimating = true;
+  // Determine book size based on viewport
+  const isMobile = window.innerWidth < 640;
+  const bookWidth = isMobile ? Math.min(window.innerWidth - 48, 300) : 360;
+  const bookHeight = Math.round(bookWidth * 1.35);
 
-    const direction = target > currentPage ? 1 : -1;
-    const outPage = pages[currentPage];
-    const inPage = pages[target];
+  const pageFlip = new PageFlip(container, {
+    width: bookWidth,
+    height: bookHeight,
+    size: "fixed",
+    showCover: true,
+    maxShadowOpacity: 0.4,
+    mobileScrollSupport: false,
+    useMouseEvents: true,
+    flippingTime: 800,
+    startPage: 0,
+    drawShadow: true,
+    autoSize: false,
+    startZIndex: 0,
+    usePortrait: isMobile,
+    swipeDistance: 30,
+  });
 
-    // Animate out current page (flip away)
-    gsap.to(outPage, {
-      rotateY: direction * -90,
-      opacity: 0,
-      scale: 0.95,
-      duration: 0.6,
-      ease: "power2.in",
-      onComplete: () => {
-        outPage.style.zIndex = "0";
-        outPage.style.pointerEvents = "none";
-      },
-    });
+  // Load pages from hidden templates
+  const pageElements = templates.querySelectorAll(".page");
+  pageFlip.loadFromHTML(pageElements);
 
-    // Prepare incoming page
-    gsap.set(inPage, {
-      rotateY: direction * 20,
-      opacity: 0,
-      scale: 0.95,
-      zIndex: 10,
-      pointerEvents: "auto",
-    });
-
-    // Animate in new page (flip in)
-    gsap.to(inPage, {
-      rotateY: 0,
-      opacity: 1,
-      scale: 1,
-      duration: 0.6,
-      delay: 0.15,
-      ease: "power2.out",
-      onComplete: () => {
-        isAnimating = false;
-      },
-    });
-
-    // Update state
-    currentPage = target;
-    updateControls();
+  function updateCounter() {
+    const current = pageFlip.getCurrentPageIndex();
+    const total = pageFlip.getPageCount();
+    counter.textContent = `${current + 1} / ${total}`;
   }
 
-  function updateControls() {
-    prevBtn.disabled = currentPage === 0;
-    nextBtn.disabled = currentPage === totalPages - 1;
-    counter.textContent = `page ${currentPage + 1} of ${totalPages}`;
+  pageFlip.on("flip", () => updateCounter());
+  updateCounter();
 
-    dots.forEach((dot, i) => {
-      if (i === currentPage) {
-        dot.classList.add("bg-lamplight", "scale-125");
-        dot.classList.remove("bg-lavender/20");
-      } else {
-        dot.classList.remove("bg-lamplight", "scale-125");
-        dot.classList.add("bg-lavender/20");
-      }
-    });
-  }
+  prevBtn.addEventListener("click", () => pageFlip.flipPrev());
+  nextBtn.addEventListener("click", () => pageFlip.flipNext());
 
-  prevBtn.addEventListener("click", () => goToPage(currentPage - 1));
-  nextBtn.addEventListener("click", () => goToPage(currentPage + 1));
-  dots.forEach((dot, i) => dot.addEventListener("click", () => goToPage(i)));
-
-  // Keyboard navigation
+  // Keyboard
   document.addEventListener("keydown", (e) => {
-    const bookRect = document.getElementById("book-wrapper")!.getBoundingClientRect();
-    const inView = bookRect.top < window.innerHeight && bookRect.bottom > 0;
+    const rect = container.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight && rect.bottom > 0;
     if (!inView) return;
-
-    if (e.key === "ArrowLeft") goToPage(currentPage - 1);
-    if (e.key === "ArrowRight") goToPage(currentPage + 1);
+    if (e.key === "ArrowLeft") pageFlip.flipPrev();
+    if (e.key === "ArrowRight") pageFlip.flipNext();
   });
 
-  // Scroll-triggered entrance
+  // Scroll entrance
   gsap.from(".experience-header", {
-    scrollTrigger: {
-      trigger: "#experience",
-      start: "top 70%",
-      toggleActions: "play none none reverse",
-    },
-    y: 40,
-    opacity: 0,
-    duration: 0.8,
-    ease: "power3.out",
+    scrollTrigger: { trigger: "#experience", start: "top 70%", toggleActions: "play none none reverse" },
+    y: 40, opacity: 0, duration: 0.8, ease: "power3.out",
   });
 
-  gsap.from("#book-wrapper", {
-    scrollTrigger: {
-      trigger: "#book-wrapper",
-      start: "top 80%",
-      toggleActions: "play none none reverse",
-    },
-    y: 50,
-    opacity: 0,
-    duration: 0.9,
-    ease: "power3.out",
+  gsap.from("#flipbook", {
+    scrollTrigger: { trigger: "#flipbook", start: "top 85%", toggleActions: "play none none reverse" },
+    y: 50, opacity: 0, duration: 0.9, ease: "power3.out",
   });
 </script>
