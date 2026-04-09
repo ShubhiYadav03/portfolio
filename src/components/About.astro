@@ -50,8 +50,15 @@ const facets = [
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { initGlobe } from "../three/globe";
 
   gsap.registerPlugin(ScrollTrigger);
+
+  // Initialize 3D globe
+  const globeCanvas = document.getElementById("globe-canvas") as HTMLCanvasElement;
+  if (globeCanvas) {
+    initGlobe(globeCanvas);
+  }
 
   // Animate heading
   gsap.from(".about-header", {
