@@ -27,18 +27,18 @@ const facets = [
     <!-- Text content -->
     <div class="flex flex-col gap-8">
       <div class="about-header">
-        <p class="text-lamplight text-sm tracking-[0.3em] uppercase mb-3">About</p>
+        <p class="text-lamplight text-sm tracking-[0.3em] uppercase mb-3 neon-text">About</p>
         <h2 class="text-4xl md:text-5xl font-serif text-cream leading-tight">
-          A Little World<br />Made <span class="text-lamplight italic">Cunningly</span>
+          A Little World<br />Made <span class="text-bright-gold italic neon-text-pink">Cunningly</span>
         </h2>
-        <p class="text-lavender/60 text-sm mt-2 italic font-serif">— John Donne</p>
+        <p class="text-starlight/60 text-sm mt-2 italic font-serif neon-text-purple">— John Donne</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="facets-grid">
         {facets.map((facet) => (
-          <div class="facet-card group p-4 rounded-xl border border-cream/5 bg-cream/[0.02] hover:border-lamplight/30 hover:bg-lamplight/[0.04] transition-all duration-300 cursor-default">
+          <div class="facet-card group p-4 rounded-xl border border-lamplight/10 bg-lamplight/[0.02] hover:neon-border transition-all duration-300 cursor-default">
             <span class="text-2xl mb-2 block">{facet.emoji}</span>
-            <h3 class="text-cream font-serif text-lg mb-1">{facet.title}</h3>
+            <h3 class="text-cream font-serif text-lg mb-1 group-hover:neon-text transition-all">{facet.title}</h3>
             <p class="text-lavender/60 text-sm leading-relaxed">{facet.description}</p>
           </div>
         ))}

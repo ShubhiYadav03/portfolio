@@ -22,7 +22,7 @@ const { title, description = "A little world made cunningly — Portfolio" } = A
 
     <title>{title}</title>
   </head>
-  <body>
+  <body class="neon-gradient-bg">
     <!-- Three.js background canvas (injected by starField.ts) -->
     <canvas id="three-canvas"></canvas>
 
@@ -30,6 +30,54 @@ const { title, description = "A little world made cunningly — Portfolio" } = A
     <main>
       <slot />
     </main>
+
+    <!-- Neon cursor trail -->
+    <script is:inline>
+      (function() {
+        const colors = ['#00f0ff', '#ff00aa', '#b44dff', '#39ff14', '#ff6b2b'];
+        const trails = [];
+        const TRAIL_COUNT = 12;
+
+        for (let i = 0; i < TRAIL_COUNT; i++) {
+          const dot = document.createElement('div');
+          dot.className = 'cursor-trail';
+          dot.style.opacity = '0';
+          document.body.appendChild(dot);
+          trails.push({ el: dot, x: 0, y: 0 });
+        }
+
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        });
+
+        function animate() {
+          let prevX = mouseX, prevY = mouseY;
+          trails.forEach((trail, i) => {
+            const speed = 0.3 - (i * 0.015);
+            trail.x += (prevX - trail.x) * speed;
+            trail.y += (prevY - trail.y) * speed;
+
+            const size = 8 - i * 0.5;
+            const opacity = (1 - i / TRAIL_COUNT) * 0.6;
+            const color = colors[i % colors.length];
+
+            trail.el.style.transform = `translate(${trail.x - size/2}px, ${trail.y - size/2}px)`;
+            trail.el.style.width = size + 'px';
+            trail.el.style.height = size + 'px';
+            trail.el.style.opacity = String(opacity);
+            trail.el.style.background = color;
+            trail.el.style.boxShadow = `0 0 ${size * 2}px ${color}, 0 0 ${size * 4}px ${color}`;
+
+            prevX = trail.x;
+            prevY = trail.y;
+          });
+          requestAnimationFrame(animate);
+        }
+        animate();
+      })();
+    </script>
 
     <style is:global>
       @import "../styles/global.css";

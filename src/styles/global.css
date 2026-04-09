@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
-/* ── Ink & Starlight Palette ── */
+/* ── NEON TRIPPY Palette ── */
 @theme {
-  --color-midnight: #080b1a;
-  --color-deep-indigo: #0f1535;
-  --color-lamplight: #d4a853;
-  --color-bright-gold: #f0c66e;
-  --color-cream: #f0e6d3;
-  --color-lavender: #a0a0c0;
-  --color-starlight: #e8e0f0;
-  --color-amber-glow: #ff9f43;
+  --color-midnight: #050510;
+  --color-deep-indigo: #0a0a2e;
+  --color-lamplight: #00f0ff;
+  --color-bright-gold: #ff00aa;
+  --color-cream: #e0e0ff;
+  --color-lavender: #8888cc;
+  --color-starlight: #b44dff;
+  --color-amber-glow: #39ff14;
+  --color-neon-orange: #ff6b2b;
 
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Inter", system-ui, sans-serif;
@@ -23,7 +24,7 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: linear-gradient(180deg, var(--color-midnight) 0%, var(--color-deep-indigo) 100%);
+  background: var(--color-midnight);
   color: var(--color-cream);
   min-height: 100vh;
   overflow-x: hidden;
@@ -34,13 +35,85 @@ h1, h2, h3, h4 {
   font-family: var(--font-serif);
 }
 
-/* ── Selection ── */
-::selection {
-  background: color-mix(in srgb, var(--color-lamplight) 40%, transparent);
-  color: var(--color-cream);
+/* ── Neon Glow Utilities ── */
+.neon-text {
+  text-shadow:
+    0 0 7px var(--color-lamplight),
+    0 0 20px var(--color-lamplight),
+    0 0 42px color-mix(in srgb, var(--color-lamplight) 60%, transparent);
 }
 
-/* ── Scrollbar ── */
+.neon-text-pink {
+  text-shadow:
+    0 0 7px var(--color-bright-gold),
+    0 0 20px var(--color-bright-gold),
+    0 0 42px color-mix(in srgb, var(--color-bright-gold) 60%, transparent);
+}
+
+.neon-text-purple {
+  text-shadow:
+    0 0 7px var(--color-starlight),
+    0 0 20px var(--color-starlight),
+    0 0 42px color-mix(in srgb, var(--color-starlight) 60%, transparent);
+}
+
+.neon-text-green {
+  text-shadow:
+    0 0 7px var(--color-amber-glow),
+    0 0 20px var(--color-amber-glow),
+    0 0 42px color-mix(in srgb, var(--color-amber-glow) 60%, transparent);
+}
+
+.neon-border {
+  box-shadow:
+    0 0 5px var(--color-lamplight),
+    0 0 15px color-mix(in srgb, var(--color-lamplight) 40%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--color-lamplight) 10%, transparent);
+  border-color: var(--color-lamplight) !important;
+}
+
+.neon-border-pink {
+  box-shadow:
+    0 0 5px var(--color-bright-gold),
+    0 0 15px color-mix(in srgb, var(--color-bright-gold) 40%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--color-bright-gold) 10%, transparent);
+  border-color: var(--color-bright-gold) !important;
+}
+
+.neon-border-purple {
+  box-shadow:
+    0 0 5px var(--color-starlight),
+    0 0 15px color-mix(in srgb, var(--color-starlight) 40%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--color-starlight) 10%, transparent);
+  border-color: var(--color-starlight) !important;
+}
+
+/* Animated gradient background shimmer */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.neon-gradient-bg {
+  background: linear-gradient(
+    135deg,
+    var(--color-midnight) 0%,
+    #0d0030 25%,
+    #100020 50%,
+    #000d1a 75%,
+    var(--color-midnight) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+/* Selection */
+::selection {
+  background: color-mix(in srgb, var(--color-lamplight) 35%, transparent);
+  color: #fff;
+}
+
+/* Scrollbar — neon */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -48,11 +121,12 @@ h1, h2, h3, h4 {
   background: var(--color-midnight);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-lamplight);
+  background: linear-gradient(180deg, var(--color-lamplight), var(--color-starlight));
   border-radius: 3px;
+  box-shadow: 0 0 6px var(--color-lamplight);
 }
 
-/* ── Reduced Motion ── */
+/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -61,7 +135,7 @@ h1, h2, h3, h4 {
   }
 }
 
-/* ── Canvas (Three.js) ── */
+/* Canvas (Three.js) */
 #three-canvas {
   position: fixed;
   top: 0;
@@ -72,7 +146,7 @@ h1, h2, h3, h4 {
   pointer-events: none;
 }
 
-/* ── Section Base ── */
+/* Section Base */
 .section {
   position: relative;
   z-index: 1;
@@ -83,10 +157,23 @@ h1, h2, h3, h4 {
   padding: 4rem 1.5rem;
 }
 
-/* ── Gold Divider ── */
+/* Neon Divider */
 .divider {
-  width: 60px;
+  width: 80px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--color-lamplight), transparent);
+  background: linear-gradient(90deg, transparent, var(--color-lamplight), var(--color-bright-gold), var(--color-starlight), transparent);
   margin: 0 auto;
+  box-shadow: 0 0 8px var(--color-lamplight), 0 0 20px color-mix(in srgb, var(--color-lamplight) 40%, transparent);
 }
+
+/* Neon cursor trail */
+.cursor-trail {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: screen;
+}
+

@@ -1,11 +1,8 @@
 import * as THREE from "three";
 
 /**
- * Star Field — "Fate Written in the Stars"
- *
- * A persistent particle system that fills the background with drifting stars.
- * Stars respond to mouse movement (parallax) and scroll position.
- * A constellation traces connecting lines on the hero section.
+ * TRIPPY Star Field — Neon particles, nebula clouds, color-shifting.
+ * Multicolor neon particles with reactive parallax and pulsing nebula.
  */
 
 interface StarFieldState {
@@ -13,13 +10,13 @@ interface StarFieldState {
   camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
   stars: THREE.Points;
+  nebula: THREE.Points;
   constellation: THREE.LineSegments;
   mouse: { x: number; y: number };
   scroll: number;
   animationId: number;
 }
 
-// Constellation points that will connect to form a pattern
 const CONSTELLATION_POINTS = [
   new THREE.Vector3(-1.8, 0.8, 0),
   new THREE.Vector3(-1.2, 1.4, 0),
@@ -45,20 +42,19 @@ function createStars(count: number): THREE.Points {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
-  const opacities = new Float32Array(count);
+  const colorIndices = new Float32Array(count);
 
   for (let i = 0; i < count; i++) {
-    positions[i * 3] = (Math.random() - 0.5) * 40;
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 40;
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 20 - 5;
-
-    sizes[i] = Math.random() * 2.5 + 0.5;
-    opacities[i] = Math.random() * 0.7 + 0.3;
+    positions[i * 3] = (Math.random() - 0.5) * 50;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 50;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 30 - 5;
+    sizes[i] = Math.random() * 3.0 + 0.5;
+    colorIndices[i] = Math.random();
   }
 
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
-  geometry.setAttribute("aOpacity", new THREE.BufferAttribute(opacities, 1));
+  geometry.setAttribute("aColorIdx", new THREE.BufferAttribute(colorIndices, 1));
 
   const material = new THREE.ShaderMaterial({
     uniforms: {
@@ -67,39 +63,135 @@ function createStars(count: number): THREE.Points {
     },
     vertexShader: `
       attribute float aSize;
-      attribute float aOpacity;
+      attribute float aColorIdx;
+      varying float vColorIdx;
       varying float vOpacity;
       uniform float uTime;
       uniform float uPixelRatio;
 
       void main() {
         vec3 pos = position;
-        // Gentle drift
-        pos.x += sin(uTime * 0.1 + position.y * 0.5) * 0.05;
-        pos.y += cos(uTime * 0.08 + position.x * 0.3) * 0.05;
+        // Trippy wave drift
+        pos.x += sin(uTime * 0.15 + position.y * 0.3 + position.z * 0.2) * 0.15;
+        pos.y += cos(uTime * 0.12 + position.x * 0.2 + position.z * 0.3) * 0.15;
+        pos.z += sin(uTime * 0.1 + position.x * 0.1) * 0.1;
 
         vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
         gl_Position = projectionMatrix * mvPosition;
 
-        // Twinkle
-        float twinkle = sin(uTime * 2.0 + position.x * 10.0 + position.y * 10.0) * 0.3 + 0.7;
-        gl_PointSize = aSize * uPixelRatio * (8.0 / -mvPosition.z) * twinkle;
+        // Aggressive twinkle
+        float twinkle = sin(uTime * 3.0 + position.x * 8.0 + position.y * 8.0) * 0.4 + 0.6;
+        gl_PointSize = aSize * uPixelRatio * (10.0 / -mvPosition.z) * twinkle;
 
-        vOpacity = aOpacity * twinkle;
+        vColorIdx = aColorIdx + sin(uTime * 0.5 + position.x) * 0.1;
+        vOpacity = (0.5 + aColorIdx * 0.5) * twinkle;
       }
     `,
     fragmentShader: `
+      varying float vColorIdx;
       varying float vOpacity;
 
+      vec3 neonPalette(float t) {
+        // Cycle through: cyan → pink → purple → green → cyan
+        vec3 cyan   = vec3(0.0, 0.94, 1.0);
+        vec3 pink   = vec3(1.0, 0.0, 0.67);
+        vec3 purple = vec3(0.71, 0.3, 1.0);
+        vec3 green  = vec3(0.22, 1.0, 0.08);
+
+        float tt = fract(t) * 4.0;
+        if (tt < 1.0) return mix(cyan, pink, tt);
+        if (tt < 2.0) return mix(pink, purple, tt - 1.0);
+        if (tt < 3.0) return mix(purple, green, tt - 2.0);
+        return mix(green, cyan, tt - 3.0);
+      }
+
       void main() {
-        // Soft circular point
         float d = length(gl_PointCoord - vec2(0.5));
         if (d > 0.5) discard;
 
-        float alpha = smoothstep(0.5, 0.1, d) * vOpacity;
-        // Warm starlight color: mix of white and gold
-        vec3 color = mix(vec3(0.91, 0.88, 0.94), vec3(0.83, 0.66, 0.33), 0.15);
+        float alpha = smoothstep(0.5, 0.05, d) * vOpacity;
+        // Extra glow ring
+        float ring = smoothstep(0.35, 0.25, d) - smoothstep(0.25, 0.15, d);
+        alpha += ring * 0.3;
+
+        vec3 color = neonPalette(vColorIdx);
         gl_FragColor = vec4(color, alpha);
+      }
+    `,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+
+  return new THREE.Points(geometry, material);
+}
+
+/** Soft nebula clouds — large fuzzy colored blobs */
+function createNebula(count: number): THREE.Points {
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+  const sizes = new Float32Array(count);
+
+  const nebulaColors = [
+    [0.0, 0.94, 1.0],    // cyan
+    [1.0, 0.0, 0.67],    // pink
+    [0.71, 0.3, 1.0],    // purple
+    [0.22, 1.0, 0.08],   // green
+    [1.0, 0.42, 0.17],   // orange
+  ];
+
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 35;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 35;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 15 - 10;
+    sizes[i] = Math.random() * 80 + 30;
+
+    const c = nebulaColors[Math.floor(Math.random() * nebulaColors.length)];
+    colors[i * 3] = c[0];
+    colors[i * 3 + 1] = c[1];
+    colors[i * 3 + 2] = c[2];
+  }
+
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  geometry.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
+
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 },
+      uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+    },
+    vertexShader: `
+      attribute float aSize;
+      attribute vec3 color;
+      varying vec3 vColor;
+      uniform float uTime;
+      uniform float uPixelRatio;
+
+      void main() {
+        vec3 pos = position;
+        pos.x += sin(uTime * 0.05 + position.y * 0.1) * 0.5;
+        pos.y += cos(uTime * 0.04 + position.x * 0.1) * 0.5;
+
+        vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+        gl_Position = projectionMatrix * mvPosition;
+        gl_PointSize = aSize * uPixelRatio * (5.0 / -mvPosition.z);
+
+        vColor = color;
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vColor;
+      uniform float uTime;
+
+      void main() {
+        float d = length(gl_PointCoord - vec2(0.5));
+        if (d > 0.5) discard;
+        float alpha = smoothstep(0.5, 0.0, d) * 0.04;
+        // Subtle pulse
+        alpha *= 0.7 + sin(uTime * 0.3) * 0.3;
+        gl_FragColor = vec4(vColor, alpha);
       }
     `,
     transparent: true,
@@ -128,7 +220,6 @@ function createConstellation(): THREE.LineSegments {
       uTime: { value: 0 },
     },
     vertexShader: `
-      varying vec2 vUv;
       void main() {
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
@@ -138,9 +229,10 @@ function createConstellation(): THREE.LineSegments {
       uniform float uTime;
 
       void main() {
-        float glow = sin(uTime * 1.5) * 0.15 + 0.85;
-        vec3 gold = vec3(0.83, 0.66, 0.33);
-        gl_FragColor = vec4(gold, uProgress * 0.4 * glow);
+        float glow = sin(uTime * 2.0) * 0.2 + 0.8;
+        // Neon cyan lines
+        vec3 color = vec3(0.0, 0.94, 1.0);
+        gl_FragColor = vec4(color, uProgress * 0.6 * glow);
       }
     `,
     transparent: true,
@@ -154,14 +246,11 @@ function createConstellation(): THREE.LineSegments {
 }
 
 export function initStarField(canvas: HTMLCanvasElement): StarFieldState {
-  // Detect reduced motion preference
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // Adapt star count to device
   const isMobile = window.innerWidth < 768;
-  const starCount = isMobile ? 800 : 1500;
+  const starCount = isMobile ? 1200 : 2500;
+  const nebulaCount = isMobile ? 15 : 30;
 
-  // Scene setup
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.z = 8;
@@ -173,75 +262,70 @@ export function initStarField(canvas: HTMLCanvasElement): StarFieldState {
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
+  renderer.setClearColor(0x050510, 1);
 
-  // Create objects
+  const nebula = createNebula(nebulaCount);
   const stars = createStars(starCount);
   const constellation = createConstellation();
+  scene.add(nebula);
   scene.add(stars);
   scene.add(constellation);
 
-  // State
   const state: StarFieldState = {
-    scene, camera, renderer, stars, constellation,
+    scene, camera, renderer, stars, nebula, constellation,
     mouse: { x: 0, y: 0 },
     scroll: 0,
     animationId: 0,
   };
 
-  // Mouse tracking (parallax)
   window.addEventListener("mousemove", (e) => {
     state.mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
     state.mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
   });
 
-  // Scroll tracking
   window.addEventListener("scroll", () => {
     state.scroll = window.scrollY / window.innerHeight;
   });
 
-  // Resize
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    (stars.material as THREE.ShaderMaterial).uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio, 2);
+    const pr = Math.min(window.devicePixelRatio, 2);
+    (stars.material as THREE.ShaderMaterial).uniforms.uPixelRatio.value = pr;
+    (nebula.material as THREE.ShaderMaterial).uniforms.uPixelRatio.value = pr;
   });
 
-  // Animation loop
   const clock = new THREE.Clock();
 
   function animate() {
     state.animationId = requestAnimationFrame(animate);
 
     const elapsed = clock.getElapsedTime();
-    const starMaterial = stars.material as THREE.ShaderMaterial;
-    const constellationMaterial = constellation.material as THREE.ShaderMaterial;
+    const starMat = stars.material as THREE.ShaderMaterial;
+    const nebulaMat = nebula.material as THREE.ShaderMaterial;
+    const constMat = constellation.material as THREE.ShaderMaterial;
 
-    // Update uniforms
-    starMaterial.uniforms.uTime.value = elapsed;
-    constellationMaterial.uniforms.uTime.value = elapsed;
+    starMat.uniforms.uTime.value = elapsed;
+    nebulaMat.uniforms.uTime.value = elapsed;
+    constMat.uniforms.uTime.value = elapsed;
 
-    // Constellation fades in during first 3 seconds, fades out as you scroll past hero
     const constellationProgress = Math.min(elapsed / 3, 1) * Math.max(1 - state.scroll * 1.5, 0);
-    constellationMaterial.uniforms.uProgress.value = constellationProgress;
+    constMat.uniforms.uProgress.value = constellationProgress;
 
     if (!prefersReducedMotion) {
-      // Parallax: camera follows mouse gently
-      camera.position.x += (state.mouse.x * 0.3 - camera.position.x) * 0.02;
-      camera.position.y += (-state.mouse.y * 0.3 - camera.position.y) * 0.02;
-
-      // Scroll: camera drifts deeper into the star field
+      // Stronger parallax
+      camera.position.x += (state.mouse.x * 0.5 - camera.position.x) * 0.03;
+      camera.position.y += (-state.mouse.y * 0.5 - camera.position.y) * 0.03;
       camera.position.z = 8 - state.scroll * 0.5;
 
-      // Gentle star field rotation
-      stars.rotation.y = elapsed * 0.01;
-      stars.rotation.x = elapsed * 0.005;
+      // Faster rotation for trippy feel
+      stars.rotation.y = elapsed * 0.02;
+      stars.rotation.x = elapsed * 0.008;
+      nebula.rotation.y = elapsed * 0.005;
+      nebula.rotation.x = elapsed * 0.003;
     }
-
-    // Fade out stars slightly as user scrolls deep
-    starMaterial.uniforms.uTime.value = elapsed;
 
     renderer.render(scene, camera);
   }

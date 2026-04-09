@@ -16,10 +16,10 @@ interface Hotspot {
 }
 
 const HOTSPOTS: Hotspot[] = [
-  { position: new THREE.Vector3(), label: "Gaming", emoji: "🎮", color: new THREE.Color(0xff9f43) },
-  { position: new THREE.Vector3(), label: "Reading", emoji: "📚", color: new THREE.Color(0xd4a853) },
-  { position: new THREE.Vector3(), label: "Engineering", emoji: "💻", color: new THREE.Color(0xe8e0f0) },
-  { position: new THREE.Vector3(), label: "Music", emoji: "🎵", color: new THREE.Color(0xf0c66e) },
+  { position: new THREE.Vector3(), label: "Gaming", emoji: "🎮", color: new THREE.Color(0x39ff14) },
+  { position: new THREE.Vector3(), label: "Reading", emoji: "📚", color: new THREE.Color(0x00f0ff) },
+  { position: new THREE.Vector3(), label: "Engineering", emoji: "💻", color: new THREE.Color(0xff00aa) },
+  { position: new THREE.Vector3(), label: "Music", emoji: "🎵", color: new THREE.Color(0xb44dff) },
 ];
 
 // Place hotspots on sphere surface using lat/lng
@@ -40,9 +40,9 @@ function createGlobeMesh(): THREE.Group {
   const sphereGeom = new THREE.IcosahedronGeometry(1.8, 3);
   const wireframe = new THREE.WireframeGeometry(sphereGeom);
   const wireMaterial = new THREE.LineBasicMaterial({
-    color: 0xd4a853,
+    color: 0x00f0ff,
     transparent: true,
-    opacity: 0.12,
+    opacity: 0.18,
   });
   const wireLines = new THREE.LineSegments(wireframe, wireMaterial);
   group.add(wireLines);
@@ -67,16 +67,18 @@ function createGlobeMesh(): THREE.Group {
       varying vec3 vNormal;
       varying vec3 vPosition;
       void main() {
-        // Fresnel-like edge glow
         float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 3.0);
-        vec3 gold = vec3(0.83, 0.66, 0.33);
-        vec3 indigo = vec3(0.06, 0.08, 0.2);
+        // Neon color shift: cyan ↔ pink over time
+        vec3 cyan = vec3(0.0, 0.94, 1.0);
+        vec3 pink = vec3(1.0, 0.0, 0.67);
+        vec3 purple = vec3(0.71, 0.3, 1.0);
+        float shift = sin(uTime * 0.4) * 0.5 + 0.5;
+        vec3 neonColor = mix(cyan, mix(pink, purple, shift), shift);
+        vec3 dark = vec3(0.02, 0.02, 0.08);
 
-        // Subtle pulse
-        float pulse = sin(uTime * 0.8) * 0.1 + 0.9;
-
-        vec3 color = mix(indigo, gold, fresnel * pulse);
-        float alpha = fresnel * 0.35 * pulse;
+        float pulse = sin(uTime * 1.2) * 0.15 + 0.85;
+        vec3 color = mix(dark, neonColor, fresnel * pulse);
+        float alpha = fresnel * 0.5 * pulse;
 
         gl_FragColor = vec4(color, alpha);
       }
@@ -91,9 +93,9 @@ function createGlobeMesh(): THREE.Group {
 
   // Latitude / longitude grid lines
   const gridMaterial = new THREE.LineBasicMaterial({
-    color: 0xd4a853,
+    color: 0xb44dff,
     transparent: true,
-    opacity: 0.06,
+    opacity: 0.08,
   });
 
   // Latitude circles
