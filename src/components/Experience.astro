@@ -63,12 +63,19 @@ const chapters = [
       <!-- Cover -->
       <div class="page page-cover" data-density="hard">
         <div class="page-inner cover-front">
-          <div class="flex flex-col items-center justify-center h-full gap-4 p-8 text-center">
-            <div class="w-12 h-px bg-lamplight/40 mb-2"></div>
-            <h3 class="text-3xl font-serif text-cream">The Story</h3>
-            <h3 class="text-3xl font-serif text-lamplight italic">So Far</h3>
-            <div class="w-12 h-px bg-lamplight/40 mt-2"></div>
-            <p class="text-lavender/40 text-xs mt-6 tracking-widest uppercase">Shubhi Yadav</p>
+          <!-- Corner flourishes -->
+          <span class="cover-ornament" style="top:20px;left:20px;">❧</span>
+          <span class="cover-ornament" style="top:20px;right:20px;transform:scaleX(-1);">❧</span>
+          <span class="cover-ornament" style="bottom:20px;left:20px;transform:scaleY(-1);">❧</span>
+          <span class="cover-ornament" style="bottom:20px;right:20px;transform:scale(-1);">❧</span>
+
+          <div class="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
+            <div class="w-16 h-px bg-gradient-to-r from-transparent via-[#b48c3c]/40 to-transparent mb-1"></div>
+            <p style="color:#a08050;font-size:10px;letter-spacing:0.3em;" class="uppercase font-sans">The Chronicles of</p>
+            <h3 class="text-2xl font-serif" style="color:#d4b060;">Shubhi Yadav</h3>
+            <div class="w-10 h-px bg-gradient-to-r from-transparent via-[#b48c3c]/30 to-transparent"></div>
+            <p class="font-serif italic text-sm" style="color:#8a7040;">The Story So Far</p>
+            <div class="w-16 h-px bg-gradient-to-r from-transparent via-[#b48c3c]/40 to-transparent mt-1"></div>
           </div>
         </div>
       </div>
@@ -77,21 +84,22 @@ const chapters = [
       {chapters.map((ch, index) => (
         <div class="page" data-density="soft">
           <div class="page-inner">
-            <p class="text-lamplight/40 text-[10px] tracking-[0.3em] uppercase mb-4 font-sans">{ch.chapter}</p>
-            <h3 class="text-xl font-serif text-cream mb-0.5 leading-snug">{ch.role}</h3>
-            <p class="text-lamplight font-serif italic text-sm mb-0.5">{ch.company}</p>
-            <p class="text-lavender/40 text-xs mb-4">{ch.period}</p>
-            <p class="text-lavender/70 text-xs leading-relaxed mb-4">{ch.description}</p>
+            <p class="page-chapter text-[10px] tracking-[0.3em] uppercase mb-1 font-sans">{ch.chapter}</p>
+            <div class="chapter-ornament"></div>
+            <h3 class="page-title text-lg font-serif mb-0.5 leading-snug mt-3">{ch.role}</h3>
+            <p class="page-company font-serif italic text-sm mb-0.5">{ch.company}</p>
+            <p class="page-period text-[11px] mb-4">{ch.period}</p>
+            <p class="page-text text-xs leading-relaxed mb-4">{ch.description}</p>
             <ul class="space-y-1.5">
               {ch.highlights.map((h) => (
-                <li class="flex items-start gap-2 text-lavender/50 text-xs">
-                  <span class="text-lamplight text-[10px] mt-0.5">✦</span>
+                <li class="flex items-start gap-2 page-highlight text-xs">
+                  <span class="page-accent text-[10px] mt-0.5">✦</span>
                   <span>{h}</span>
                 </li>
               ))}
             </ul>
-            <p class="absolute bottom-3 right-4 text-lavender/15 text-[10px] font-serif italic">
-              page {index + 1}
+            <p class="absolute bottom-3 right-4 page-number text-[10px] font-serif italic">
+              — {index + 1} —
             </p>
           </div>
         </div>
@@ -100,10 +108,15 @@ const chapters = [
       <!-- Back cover -->
       <div class="page page-cover" data-density="hard">
         <div class="page-inner cover-back">
+          <span class="cover-ornament" style="top:20px;left:20px;">❧</span>
+          <span class="cover-ornament" style="top:20px;right:20px;transform:scaleX(-1);">❧</span>
+          <span class="cover-ornament" style="bottom:20px;left:20px;transform:scaleY(-1);">❧</span>
+          <span class="cover-ornament" style="bottom:20px;right:20px;transform:scale(-1);">❧</span>
+
           <div class="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
-            <p class="text-lamplight/60 font-serif italic text-lg">To be continued...</p>
-            <div class="w-8 h-px bg-lamplight/30"></div>
-            <p class="text-lavender/30 text-xs">✦</p>
+            <p class="font-serif italic text-sm" style="color:#8a7040;">To be continued...</p>
+            <div class="w-8 h-px bg-[#b48c3c]/20"></div>
+            <p style="color:#6a5430;" class="text-xs">❦</p>
           </div>
         </div>
       </div>
@@ -120,20 +133,40 @@ const chapters = [
     display: none !important;
   }
 
-  /* Page base — both covers and content pages */
+  /* ── Inner pages: aged parchment ── */
   .page {
-    background: linear-gradient(135deg, #12102a 0%, #0e0c22 50%, #0a0818 100%);
-    border: 1px solid rgba(0, 240, 255, 0.08);
+    background: linear-gradient(145deg, #e8dcc8 0%, #d9c9a8 30%, #e2d4b8 60%, #d5c49e 100%);
     overflow: hidden;
     position: relative;
+    border-radius: 2px;
   }
 
+  /* Foxing stains and aging marks */
   .page::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 30% 20%, rgba(180, 77, 255, 0.04) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 80%, rgba(0, 240, 255, 0.03) 0%, transparent 60%);
+    background:
+      radial-gradient(ellipse at 15% 85%, rgba(139, 105, 60, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(120, 90, 50, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(160, 130, 80, 0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Subtle worn page edge */
+  .page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg,
+      rgba(180, 160, 120, 0.3),
+      rgba(160, 140, 100, 0.5) 30%,
+      rgba(140, 120, 80, 0.4) 70%,
+      rgba(180, 160, 120, 0.3)
+    );
     pointer-events: none;
   }
 
@@ -141,51 +174,110 @@ const chapters = [
     position: relative;
     width: 100%;
     height: 100%;
-    padding: 1.5rem;
+    padding: 1.75rem 1.5rem;
     box-sizing: border-box;
   }
 
-  /* Covers */
-  .cover-front, .cover-back {
-    background: linear-gradient(135deg, #0d0b20 0%, #08071a 100%);
-    border: 1px solid rgba(0, 240, 255, 0.12);
-    height: 100%;
-    border-radius: 2px;
-  }
-
-  .cover-front {
-    box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.03),
-                inset 0 0 60px rgba(180, 77, 255, 0.02);
-  }
-
-  /* Page spine shadow (left edge of right-side pages) */
+  /* Spine shadow on inner pages */
   .page-inner::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 16px;
+    width: 20px;
     height: 100%;
-    background: linear-gradient(90deg, rgba(0,0,0,0.15), transparent);
+    background: linear-gradient(90deg, rgba(100, 70, 30, 0.12), transparent);
     pointer-events: none;
   }
 
-  /* Neon top edge on pages */
-  .page::after {
+  /* ── Covers: aged dark leather ── */
+  .page-cover {
+    background: linear-gradient(145deg, #2a1f14 0%, #1e1508 40%, #241a0e 70%, #1a1208 100%);
+    border: none;
+    border-radius: 3px;
+  }
+
+  .page-cover::before {
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(180, 140, 60, 0.03) 0%, transparent 70%);
+  }
+
+  .page-cover::after {
+    display: none;
+  }
+
+  .cover-front, .cover-back {
+    height: 100%;
+    border-radius: 2px;
+    position: relative;
+  }
+
+  /* Ornamental border on cover — aged gold */
+  .cover-front::before, .cover-back::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.15), transparent);
+    inset: 12px;
+    border: 1px solid rgba(180, 140, 60, 0.25);
+    border-radius: 1px;
     pointer-events: none;
   }
 
-  /* StPageFlip adds .stf__parent — style the book shadow */
+  /* Double border */
+  .cover-front::after, .cover-back::after {
+    content: '';
+    position: absolute;
+    inset: 16px;
+    border: 1px solid rgba(180, 140, 60, 0.12);
+    border-radius: 1px;
+    pointer-events: none;
+  }
+
+  /* Corner flourishes on cover */
+  .cover-ornament {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    opacity: 0.3;
+    color: #b48c3c;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  /* Leather texture feel via subtle noise */
+  .cover-front {
+    box-shadow:
+      inset 0 0 40px rgba(0, 0, 0, 0.4),
+      inset 0 0 80px rgba(30, 20, 5, 0.3);
+  }
+
+  .cover-back {
+    box-shadow:
+      inset 0 0 40px rgba(0, 0, 0, 0.5),
+      inset 0 0 60px rgba(30, 20, 5, 0.3);
+  }
+
+  /* Book drop shadow — warm and deep */
   :global(.stf__parent) {
-    filter: drop-shadow(0 8px 30px rgba(0, 240, 255, 0.08))
-            drop-shadow(0 2px 10px rgba(180, 77, 255, 0.06));
+    filter: drop-shadow(0 12px 40px rgba(20, 10, 0, 0.4))
+            drop-shadow(0 4px 12px rgba(40, 25, 5, 0.3));
+  }
+
+  /* ── Text colors for parchment pages ── */
+  .page-chapter { color: #6b5430; }
+  .page-title { color: #2a1f14; }
+  .page-company { color: #7a5c2e; }
+  .page-period { color: #9a8a6c; }
+  .page-text { color: #4a3d2a; }
+  .page-highlight { color: #5a4830; }
+  .page-accent { color: #8b6914; }
+  .page-number { color: #c4b08a; }
+
+  /* Decorative chapter ornament */
+  .chapter-ornament {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #a08050, transparent);
+    margin: 0.5rem 0;
   }
 </style>
 
@@ -212,7 +304,7 @@ const chapters = [
     height: bookHeight,
     size: "fixed",
     showCover: true,
-    maxShadowOpacity: 0.4,
+    maxShadowOpacity: 0.6,
     mobileScrollSupport: false,
     useMouseEvents: true,
     flippingTime: 800,
