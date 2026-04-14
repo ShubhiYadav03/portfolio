@@ -35,14 +35,19 @@ const chapters = [
 <section id="experience" class="section relative">
   <div class="max-w-4xl mx-auto w-full">
     <!-- Section header -->
-    <div class="text-center mb-12 experience-header">
+    <div class="text-center mb-8 experience-header">
       <p class="text-lamplight text-sm tracking-[0.3em] uppercase mb-3">Experience</p>
       <h2 class="text-4xl md:text-5xl font-serif text-cream">Turning the <span class="text-bright-gold italic">Page</span></h2>
-      <p class="text-lavender/40 text-sm mt-2 italic">Click the page edges or use the arrows to flip</p>
       <div class="divider mt-4"></div>
     </div>
 
-    <!-- Flipbook container -->
+    <!-- 3D Book floating -->
+    <div class="relative flex justify-center mb-8" id="book-3d-container" style="height: 380px;">
+      <canvas id="book-3d-canvas" class="w-full h-full" style="max-width:600px;"></canvas>
+    </div>
+
+    <!-- Flipbook (page reading) -->
+    <p class="text-lavender/30 text-xs text-center mb-4 italic">Drag the page edges or use arrows to read</p>
     <div class="flex justify-center">
       <div id="flipbook" class="flipbook-container"></div>
     </div>
@@ -285,8 +290,21 @@ const chapters = [
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
   import { PageFlip } from "page-flip";
+  import { initBookScene } from "../three/book";
 
   gsap.registerPlugin(ScrollTrigger);
+
+  // Initialize 3D book
+  const bookCanvas = document.getElementById("book-3d-canvas") as HTMLCanvasElement;
+  if (bookCanvas) {
+    initBookScene(bookCanvas);
+  }
+
+  // Scroll: fade in 3D book dramatically
+  gsap.from("#book-3d-container", {
+    scrollTrigger: { trigger: "#book-3d-container", start: "top 85%", toggleActions: "play none none reverse" },
+    y: 80, opacity: 0, scale: 0.85, duration: 1.2, ease: "power3.out",
+  });
 
   const container = document.getElementById("flipbook")!;
   const templates = document.getElementById("page-templates")!;
